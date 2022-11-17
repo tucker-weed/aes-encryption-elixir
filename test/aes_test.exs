@@ -2,7 +2,7 @@ defmodule AESTest do
   use ExUnit.Case
   doctest AES
 
-  test "encrypted plaintext will decrypt to the original plaintext" do
+  test "ciphertext will decrypt to the original plaintext" do
     secret = AES.generate_secret("fakePassword")
     original_plaintext = "This is a random message to encrypt"
     {ciphertext, ciphertag} = AES.encrypt(original_plaintext, secret)
