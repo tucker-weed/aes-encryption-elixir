@@ -2,6 +2,7 @@ defmodule AES do
   # AES-GCM 128 bit
   @mode :aes_128_gcm
   @encryption_key_size 16
+  @cipher_tag_size 16
   @iv_size 16
   @salt_size 16
   @password_hash_position 45
@@ -23,12 +24,12 @@ defmodule AES do
   def encrypt(plaintext, secret_key) do
     iv = :crypto.strong_rand_bytes(@iv_size)
     {encrypted_text, cipher_tag} = :crypto.crypto_one_time_aead(@mode, secret_key, iv, plaintext, @aad, true)
-    encrypted_text = ( iv <>  encrypted_text )
-    {encrypted_text, cipher_tag}
+    encrypted_text = ( iv <>  cipher_tag <> encrypted_text )
+    encrypted_text
   end
 
-  def decrypt(ciphertext, ciphertag, secret_key) do
-    <<iv::binary-@iv_size, ciphertext::binary>> = ciphertext
+  def decrypt(ciphertext, secret_key) do
+    <<iv::binary-@iv_size, ciphertag::binary-@cipher_tag_size, ciphertext::binary>> = ciphertext
     try do
       :crypto.crypto_one_time_aead(@mode, secret_key, iv, ciphertext, @aad, ciphertag, false)
     rescue
