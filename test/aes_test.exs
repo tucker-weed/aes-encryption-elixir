@@ -7,10 +7,10 @@ defmodule AESTest do
     hash = AES.get_pass_hash("fakePassword", salt)
     secret = AES.generate_secret(hash)
     original_plaintext = "This is a random message to encrypt"
-    {ciphertext, ciphertag} = AES.encrypt(original_plaintext, secret)
+    ciphertext = AES.encrypt(original_plaintext, secret)
     hash = AES.get_pass_hash("fakePassword", salt)
     secret = AES.generate_secret(hash)
-    plaintext = AES.decrypt(ciphertext, ciphertag, secret)
+    plaintext = AES.decrypt(ciphertext, secret)
     assert original_plaintext == plaintext 
   end
 end
