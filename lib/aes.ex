@@ -6,7 +6,7 @@ defmodule AES do
   @salt_size 16
   @password_hash_position 55
   @password_hash_rounds 160000
-  @aad "A128GCM"
+  @aad "AES_128_GCM"
 
   def get_pass_hash(password) do
     Pbkdf2.Base.hash_password(password, generate_salt(), rounds: @password_hash_rounds, length: @encryption_key_size)
