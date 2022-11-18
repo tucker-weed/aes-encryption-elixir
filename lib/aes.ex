@@ -4,7 +4,7 @@ defmodule AES do
   @encryption_key_size 16
   @iv_size 16
   @salt_size 16
-  @password_hash_position 55
+  @password_hash_position 45
   @password_hash_rounds 160000
   @aad "AES_128_GCM"
 
@@ -13,25 +13,21 @@ defmodule AES do
   end
 
   def generate_salt do
-    :crypto.strong_rand_bytes(@salt_size) |> :base64.encode
+    :crypto.strong_rand_bytes(@salt_size)
   end
 
   def generate_secret(hash) do
-    :binary.part(hash, @password_hash_position, @encryption_key_size) |> :base64.encode
+    :binary.part(hash, @password_hash_position, @encryption_key_size)
   end
 
-  def encrypt(plaintext, key) do
-    secret_key = :base64.decode(key)
+  def encrypt(plaintext, secret_key) do
     iv = :crypto.strong_rand_bytes(@iv_size)
     {encrypted_text, cipher_tag} = :crypto.crypto_one_time_aead(@mode, secret_key, iv, plaintext, @aad, true)
     encrypted_text = ( iv <>  encrypted_text )
-    {:base64.encode(encrypted_text), :base64.encode(cipher_tag)}
+    {encrypted_text, cipher_tag}
   end
 
-  def decrypt(ciphertext, ciphertag, key) do
-    secret_key = :base64.decode(key)
-    ciphertext = :base64.decode(ciphertext)
-    ciphertag = :base64.decode(ciphertag)
+  def decrypt(ciphertext, ciphertag, secret_key) do
     <<iv::binary-@iv_size, ciphertext::binary>> = ciphertext
     try do
       :crypto.crypto_one_time_aead(@mode, secret_key, iv, ciphertext, @aad, ciphertag, false)
