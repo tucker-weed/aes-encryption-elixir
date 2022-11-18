@@ -8,27 +8,16 @@ defmodule AES do
   @password_hash_rounds 160000
   @aad "AES_128_GCM"
 
-  def get_pass_hash(password) do
-    Pbkdf2.Base.hash_password(password, generate_salt(), rounds: @password_hash_rounds, length: @encryption_key_size)
-  end
-
-  def get_pass_hash(password, existing_salt) do
-    {:ok, salt} = File.read(existing_salt)
+  def get_pass_hash(password, salt) do
     Pbkdf2.Base.hash_password(password, salt, rounds: @password_hash_rounds, length: @encryption_key_size)
   end
 
   def generate_salt do
-    salt = :crypto.strong_rand_bytes(@salt_size) |> :base64.encode
-    File.write("./salt", salt)
-    salt
+    :crypto.strong_rand_bytes(@salt_size) |> :base64.encode
   end
 
-  def generate_secret(password) do
-    :binary.part(get_pass_hash(password), @password_hash_position, @encryption_key_size) |> :base64.encode
-  end
-
-  def generate_secret(password, existing_salt) do
-    :binary.part(get_pass_hash(password, existing_salt), @password_hash_position, @encryption_key_size) |> :base64.encode
+  def generate_secret(hash) do
+    :binary.part(hash, @password_hash_position, @encryption_key_size) |> :base64.encode
   end
 
   def encrypt(plaintext, key) do
