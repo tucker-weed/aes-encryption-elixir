@@ -1,24 +1,20 @@
 defmodule AES do
   # AES-GCM 128 bit
   @mode :aes_128_gcm
+  @digest :sha512
   @encryption_key_size 16
   @cipher_tag_size 16
   @iv_size 16
   @salt_size 16
-  @password_hash_position 45
-  @password_hash_rounds 160000
+  @iterations 160000
   @aad "AES_128_GCM"
 
-  def get_pass_hash(password, salt) do
-    Pbkdf2.Base.hash_password(password, salt, rounds: @password_hash_rounds, length: @encryption_key_size)
+  def generate_secret(password, salt) do
+    :crypto.pbkdf2_hmac(@digest, password, salt, @iterations, @encryption_key_size)
   end
 
   def generate_salt do
     :crypto.strong_rand_bytes(@salt_size)
-  end
-
-  def generate_secret(hash) do
-    :binary.part(hash, @password_hash_position, @encryption_key_size)
   end
 
   def encrypt(plaintext, secret_key) do

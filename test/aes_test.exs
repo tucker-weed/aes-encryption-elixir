@@ -4,12 +4,10 @@ defmodule AESTest do
 
   test "ciphertext will decrypt to the original plaintext" do
     salt = AES.generate_salt()
-    hash = AES.get_pass_hash("fakePassword", salt)
-    secret = AES.generate_secret(hash)
+    secret = AES.generate_secret("fakePassword", salt)
     original_plaintext = "This is a random message to encrypt"
     ciphertext = AES.encrypt(original_plaintext, secret)
-    hash = AES.get_pass_hash("fakePassword", salt)
-    secret = AES.generate_secret(hash)
+    secret = AES.generate_secret("fakePassword", salt)
     plaintext = AES.decrypt(ciphertext, secret)
     assert original_plaintext == plaintext 
   end
